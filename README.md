@@ -89,7 +89,7 @@ Additionally, Cogs will allow you to manage what cogs are currently "loaded" on 
   end
 end
 
-@bot.command :load, cog @name do |event, cogname|
+@bot.command :load, cog: @name do |event, cogname|
   begin
     @bot.reload_cog(cog: cogname)
     event.respond "Loaded cog #{cogname}!"
