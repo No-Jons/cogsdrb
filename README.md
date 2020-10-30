@@ -5,7 +5,7 @@ Cogs for [discordrb](https://github.com/discordrb/discordrb), in the style of [d
 Cogs allow you to load commands, events, and variables from outside of the main bot file, 
 which helps improve organization and readability of code.
 
-#### Note: This gem is in extremely early development. As of now, it is extremely bare bones. More features will be added soon, and everyone is welcome to contribute. Additionally, the code is short but manages to be wack.
+#### Note: This gem is in extremely early development. As of now, it is extremely bare bones. More features will be added soon, and everyone is welcome to contribute. Additionally, the code is kinda hacky in some parts, and that will be fixed.
 
 ## Installation
 
