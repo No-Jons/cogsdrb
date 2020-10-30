@@ -39,10 +39,13 @@ require 'discordrb'
 require 'cogsdrb'
 
 bot = Cogs::BaseBotClass.new(token="<token>", prefix="r!")
-path_to_cogs = "C:/FULL/PATH/TO/COGS/" # As of now, cogs can only be loaded using the full path to the file
+path_to_cogs = "Path/to/cogs/dir" # Not necessary, but cuts down on repeated values.
+# Cogs are loaded by using ruby's `load` keyword to allow updating while the bot runs.
+# as such they must be loaded by using a filepath to the ruby file. It's like requiring,
+# but you load it with the function `bot.load_extension`.
 
 %w(mod fun).each do |i| # in this example, the path leads to the folder containing `mod.rb` and `fun.rb`
-  bot.load_cog(fp="#{path_to_cogs}#{i}")
+  bot.load_extension(fp="#{path_to_cogs}#{i}")
 end
 
 bot.run
@@ -56,11 +59,15 @@ require 'cogsdrb'
 
 class Fun < Cogs::Cog # Class *must* inherit from `Cogs::Cog`
   def initialize(bot: Discordrb::Commands::CommandBot)
+    super(name: "Fun") # Required for command categorization. Unload/reload will not update the bot without this line.
     @bot = bot
   end
 
   def commands # all commands for a cog *must* be contained in a function named `commands`
-    @bot.command :test do |event| # As many commands as you want can be added in this function
+    @bot.command :test, cog: @name do |event| # to categorize the command in a cog, 
+    # include the `cog` argument.
+    # (this will be updated to be categorized automatically in the near future).
+    # As many commands as you want can be added in this function
       event.respond "Works"
     end
   end
@@ -71,7 +78,32 @@ def setup(bot)
 end
 ```
 
-Support for events and unloading/loading cogs will come in the near future.
+Additionally, Cogs will allow you to manage what cogs are currently "loaded" on your bot. Here are come example commands for managing cogs.
+```ruby
+@bot.command :unload, cog: @name do |event, cogname|
+  begin
+    @bot.unload_cog(cog: cogname)
+    event.respond "Unloaded cog #{cogname}!"
+  rescue Cogs::CogError
+    event.respond "Whoops! Cog #{cogname} either doesn't exist or is already unloaded! Did you spell it right?"
+  end
+end
+
+@bot.command :load, cog @name do |event, cogname|
+  begin
+    @bot.reload_cog(cog: cogname)
+    event.respond "Loaded cog #{cogname}!"
+  rescue Cogs::CogError
+    event.respond "Whoops! Cog #{cogname} doesn't exist! Did you spell it correctly?"
+  end
+end
+```
+
+"Unloading" a cog removes all commands categorized in the cog from the bot. "Reloading" allows you to apply updates to
+the bot without terminating the process, as the cog file can be edited and reloaded without terminating
+the bot process.
+
+Support for events will come in the near future.
 
 ## Development
 
