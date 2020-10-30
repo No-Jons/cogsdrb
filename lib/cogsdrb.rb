@@ -2,9 +2,6 @@ require 'discordrb'
 require "cogsdrb/version"
 
 module Cogs
-    class Error < StandardError; end
-    # Your code goes here...
-
     class BaseBotClass < Discordrb::Commands::CommandBot
         def initialize(token, prefix)
             super token: token, prefix: prefix
