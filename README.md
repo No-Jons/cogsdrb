@@ -62,39 +62,38 @@ require 'cogsdrb'
 
 class Fun < Cogs::Cog # Class *must* inherit from `Cogs::Cog`
   def initialize(bot: Discordrb::Commands::CommandBot)
-    super(name: "Fun") # Required for command categorization. Unload/reload will not update the bot without this line.
-    @bot = bot
+    super(bot) # Required for command registration.
+    self.command :hello do |event|
+      event.respond "👋 Hello, #{event.author.mention}!"
+    end
   end
 
-  def commands # all commands for a cog *must* be contained in a function named `commands`
-    @bot.command :test, cog: @name do |event| # to categorize the command in a cog, 
-    # include the `cog` argument.
-    # (this will be updated to be categorized automatically in the near future).
-    # As many commands as you want can be added in this function
+  def commands # commands can either be declared in the `initialize` function or a function named `commands`
+    self.command :test do |event| # As many commands as you want can be added in either function
       event.respond "Works"
     end
   end
 end
 
 def setup(bot)
-  bot.add_cog(Fun.new bot: bot) # Additionally, all cog files *must* contain this function, or else an error will be thrown and the cog not loaded
+  bot.add_cog(Fun) # Additionally, all cog files *must* contain this function, or else an error will be thrown and the cog not loaded
 end
 ```
 
 Additionally, Cogs will allow you to manage what cogs are currently "loaded" on your bot. Here are come example commands for managing cogs.
 ```ruby
-@bot.command :unload, cog: @name do |event, cogname|
+self.command :unload do |event, cogname|
   begin
-    @bot.unload_cog(cog: cogname)
+    @bot.unload_cog(cogname: cogname)
     event.respond "Unloaded cog #{cogname}!"
   rescue Cogs::CogError
     event.respond "Whoops! Cog #{cogname} either doesn't exist or is already unloaded! Did you spell it right?"
   end
 end
 
-@bot.command :load, cog: @name do |event, cogname|
+self.command :load do |event, cogname|
   begin
-    @bot.reload_cog(cog: cogname)
+    @bot.reload_cog(cogname)
     event.respond "Loaded cog #{cogname}!"
   rescue Cogs::CogError
     event.respond "Whoops! Cog #{cogname} doesn't exist! Did you spell it correctly?"

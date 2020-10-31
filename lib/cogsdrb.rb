@@ -5,13 +5,19 @@ require "commands"
 
 module Cogs
     class Cog
-        def initialize(name: "Cog")
-            @name = name
-            @fp = fp
+        def initialize(bot)
+            @bot = bot
         end
 
-        attr_reader :name
+        attr_accessor :name
         attr_accessor :fp
+
+        def command(name, attributes = {}, &block)
+            attributes[:cog] = @name unless attributes[:cog]
+            @bot.command(name, attributes, &block)
+        end
+
+        def commands; end
     end
 
     # TODO:

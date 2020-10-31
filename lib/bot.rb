@@ -9,12 +9,9 @@ module Cogs
 
     end
 
+    attr_accessor :cogs
     attr_reader :cached_cogs
     attr_reader :loaded_cogs
-
-    def add_commands
-      nil
-    end
 
     def run_bot
       self.before
@@ -26,18 +23,13 @@ module Cogs
       end
     end
 
-    def before
-      nil
-    end
-
-    def after
-      nil
-    end
+    def add_commands; end
+    def before; end
+    def after; end
 
     def command(name, attributes = {}, &block)
       @commands ||= {}
 
-      # TODO: Remove in 4.0
       if name.is_a?(Array)
         name, *aliases = name
         attributes[:aliases] = aliases if attributes[:aliases].nil?
@@ -69,7 +61,9 @@ module Cogs
         load fp
         cog = setup(self)
         cog::fp = fp
+        cog::name = cog.to_s[2..].split(':')[0]
         @loaded_cogs[cog::name] = cog
+        @cached_cogs[cog::name] = cog.class
       rescue LoadError, NoMethodError => error
         self.log_exception(error)
       end
@@ -77,8 +71,8 @@ module Cogs
 
     def add_cog(cog)
       begin
+        cog = cog.new bot: self
         cog.commands
-        @cached_cogs[cog::name] = cog.class
         return cog
       rescue NoMethodError => error
         self.log_exception(error)
@@ -94,7 +88,7 @@ module Cogs
           return
         end
       end
-      if @cached_cogs.keys.include?cogname
+      if @loaded_cogs.keys.include?cogname
         @loaded_cogs = @loaded_cogs.tap { |key| delete(key) if key == cogname }
         self._remove_all_cog_commands(cogname)
         Discordrb::LOGGER.info "Unloaded cog #{cogname}"
@@ -104,15 +98,16 @@ module Cogs
     end
 
     def reload_cog(cog)
-      raise Cogs::CogError.new "Cog not found" unless @cached_cogs.keys.include?cog or @loaded_cogs.keys.include?cog
+      raise Cogs::CogError.new "Cog not found" unless @cached_cogs.include?cog or @loaded_cogs.include?cog
       if @loaded_cogs.include?cog
         self.unload_cog(cogname: cog)
       end
       self.load_extension(@loaded_cogs[cog]::fp)
+      Discordrb::LOGGER.info "Loaded cog #{cog}"
     end
 
     def load_cog(cog)
-      self.reload_cog(cog: cog)
+      self.reload_cog(cog)
     end
   end
 end
