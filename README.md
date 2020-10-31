@@ -1,5 +1,8 @@
 # CogsDRB
 
+[![Gem Version](https://badge.fury.io/rb/cogsdrb.svg)](https://badge.fury.io/rb/cogsdrb)
+[![Gem Downloads](https://badgen.net/rubygems/dt/cogsdrb)](https://badgen.net/rubygems/dt/cogsdrb)
+
 Cogs for [discordrb](https://github.com/discordrb/discordrb), in the style of [discord.py](https://github.com/Rapptz/discord.py)'s cog implementation
 
 Cogs allow you to load commands, events, and variables from outside of the main bot file, 
@@ -89,7 +92,7 @@ Additionally, Cogs will allow you to manage what cogs are currently "loaded" on 
   end
 end
 
-@bot.command :load, cog: @name do |event, cogname|
+@bot.command :load, cog @name do |event, cogname|
   begin
     @bot.reload_cog(cog: cogname)
     event.respond "Loaded cog #{cogname}!"
